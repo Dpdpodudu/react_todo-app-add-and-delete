@@ -9,7 +9,7 @@ export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
-
+  
   const [newTodoTitle, setNewTodoTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
@@ -25,12 +25,8 @@ export const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!errorMessage) {
-      return;
-    }
-
+    if (!errorMessage) return;
     const timer = setTimeout(() => setErrorMessage(''), 3000);
-
     return () => clearTimeout(timer);
   }, [errorMessage]);
 
@@ -44,7 +40,6 @@ export const App: React.FC = () => {
 
     if (!trimmedTitle) {
       setErrorMessage('Title should not be empty');
-
       return;
     }
 
@@ -66,9 +61,11 @@ export const App: React.FC = () => {
       .finally(() => {
         setTempTodo(null);
         setIsSubmitting(false);
-        if (newTodoFieldRef.current) {
-          newTodoFieldRef.current.focus();
-        }
+        setTimeout(() => {
+          if (newTodoFieldRef.current) {
+            newTodoFieldRef.current.focus();
+          }
+        }, 0);
       });
   };
 
@@ -83,29 +80,24 @@ export const App: React.FC = () => {
       .catch(() => setErrorMessage('Unable to delete a todo'))
       .finally(() => {
         setLoadingTodoIds(prev => prev.filter(id => id !== todoId));
-        if (newTodoFieldRef.current) {
-          newTodoFieldRef.current.focus();
-        }
+        setTimeout(() => {
+          if (newTodoFieldRef.current) {
+            newTodoFieldRef.current.focus();
+          }
+        }, 0);
       });
   };
 
   const handleClearCompleted = () => {
     const completedTodos = todos.filter(t => t.completed);
-
     completedTodos.forEach(todo => {
       handleDelete(todo.id);
     });
   };
 
   const visibleTodos = todos.filter(todo => {
-    if (filter === 'active') {
-      return !todo.completed;
-    }
-
-    if (filter === 'completed') {
-      return todo.completed;
-    }
-
+    if (filter === 'active') return !todo.completed;
+    if (filter === 'completed') return todo.completed;
     return true;
   });
 
@@ -119,7 +111,6 @@ export const App: React.FC = () => {
   const getFilterClass = (curr: string) => {
     return `filter__link ${filter === curr ? 'selected' : ''}`;
   };
-
   const notificationClass = [
     'notification',
     'is-danger',
@@ -224,7 +215,10 @@ export const App: React.FC = () => {
                     ×
                   </button>
 
-                  <div data-cy="TodoLoader" className="modal overlay is-active">
+                  <div
+                    data-cy="TodoLoader"
+                    className="modal overlay is-active"
+                  >
                     {/* eslint-disable-next-line max-len */}
                     <div className="modal-background has-background-white-ter" />
                     <div className="loader" />
